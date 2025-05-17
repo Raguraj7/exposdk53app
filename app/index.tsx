@@ -12,7 +12,8 @@ export default function Index() {
       <Text>Edit app/index.tsx to edit this screen. Learn sdk 53</Text>
       <Text>
         {/* <Stack.Protected guard={ } ></Stack.Protected> */}
-        testing expo web
+        testing expo web testing successfull
+
       </Text>
 
     </View>
