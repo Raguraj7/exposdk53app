@@ -13,6 +13,12 @@ export default function RootLayout() {
             headerShown: false,
           }}
         />
+        <Stack.Screen
+          name='signUp'
+          options={{
+            headerShown: false,
+          }}
+        />
       </Stack.Protected>
       <Stack.Protected guard={isSignedIn}>
         <Stack.Screen name='(chat)' />
