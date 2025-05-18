@@ -1,3 +1,4 @@
+![1000239189](https://github.com/user-attachments/assets/34ce886c-0630-4e5d-a0a7-fdb7d2d2e84b)
 Expo App with EAS Deployment
 This is a React Native app built with Expo and deployed using Expo Application Services (EAS). This README provides a complete guide to setting up, building, and deploying the app for development and production, including web hosting with EAS. It also addresses common routing issues for web deployments.
 Table of Contents
