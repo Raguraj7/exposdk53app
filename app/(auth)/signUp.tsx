@@ -1,4 +1,4 @@
-import { isClerkAPIResponseError, useSignIn, useSSO } from '@clerk/clerk-expo';
+import { isClerkAPIResponseError, useSignUp, useSSO } from '@clerk/clerk-expo';
 import { ClerkAPIError } from '@clerk/types';
 import { AntDesign, Octicons } from '@expo/vector-icons';
 import * as AuthSession from 'expo-auth-session';
@@ -21,15 +21,15 @@ WebBrowser.maybeCompleteAuthSession();
 
 const CLERK_LOGO = require('@/assets/images/clerk-logo.png'); // Replace with your logo
 
-const LoginScreen: React.FC = () => {
-  const { signIn, setActive } = useSignIn();
+const SignUpScreen: React.FC = () => {
+  const { signUp, setActive } = useSignUp();
   const { startSSOFlow } = useSSO();
   const router = useRouter();
   const [email, setEmail] = React.useState<string>('');
   const [errors, setErrors] = React.useState<ClerkAPIError[]>([]);
   const [submitting, setSubmitting] = React.useState<boolean>(false);
 
-  const handleSignInWithProvider = React.useCallback(
+  const handleSignUpWithProvider = React.useCallback(
     async (strategy: 'oauth_google' | 'oauth_github') => {
       setErrors([]);
       setSubmitting(true);
@@ -46,7 +46,7 @@ const LoginScreen: React.FC = () => {
         if (isClerkAPIResponseError(err)) setErrors(err.errors);
         else
           setErrors([
-            { message: err?.message ?? 'SSO Sign-in failed' } as ClerkAPIError,
+            { message: err?.message ?? 'SSO Sign-up failed' } as ClerkAPIError,
           ]);
       } finally {
         setSubmitting(false);
@@ -65,13 +65,10 @@ const LoginScreen: React.FC = () => {
     }
     setSubmitting(true);
     try {
-      // If you want to use magic link/email code, update this logic.
-      // This demo uses Clerk's SSO-less "sign in with email" flow.
-      const attempt = await signIn?.create({ identifier: email.trim() });
+      const attempt = await signUp?.create({ emailAddress: email.trim() });
       if (attempt?.status === 'complete' && setActive) {
         await setActive({ session: attempt.createdSessionId });
-      } else if (attempt?.status === 'needs_first_factor') {
-        // handle next factor (e.g. password, code) if needed
+      } else if (attempt?.status === 'missing_requirements') {
         setErrors([
           { message: 'Additional verification is required.' } as ClerkAPIError,
         ]);
@@ -80,19 +77,18 @@ const LoginScreen: React.FC = () => {
       if (isClerkAPIResponseError(err)) setErrors(err.errors);
       else
         setErrors([
-          { message: err?.message ?? 'Email sign-in failed' } as ClerkAPIError,
+          { message: err?.message ?? 'Email sign-up failed' } as ClerkAPIError,
         ]);
     } finally {
       setSubmitting(false);
     }
   };
 
-  const handleSignUpPress = () => {
-    router.push('/(auth)/signUp');
-    // Redirect to your sign up screen or Clerk's hosted sign up.
-    // For Clerk Expo: use navigation or a deep link to your sign-up flow.
+  const handleSignInPress = () => {
+    router.push('/(auth)');
+    // Redirect to your sign in screen or Clerk's hosted sign in.
+    // For Clerk Expo: use navigation or a deep link to your sign-in flow.
   };
-  // const handleSignUpPress = () => <Redirect href='/(auth)/signUp' />;
 
   return (
     <KeyboardAvoidingView
@@ -100,17 +96,15 @@ const LoginScreen: React.FC = () => {
       behavior={Platform.select({ ios: 'padding', android: undefined })}
     >
       <View style={styles.card}>
-        <Text style={styles.heading}>Sign in to your account</Text>
-        <Text style={styles.subheading}>
-          Welcome back! Please sign in to continue
-        </Text>
+        <Text style={styles.heading}>Create your account</Text>
+        <Text style={styles.subheading}>Sign up to get started</Text>
         {/* Social Buttons */}
         <View style={styles.socialRow}>
           <TouchableOpacity
             style={styles.socialButton}
-            onPress={() => handleSignInWithProvider('oauth_google')}
+            onPress={() => handleSignUpWithProvider('oauth_google')}
             disabled={submitting}
-            accessibilityLabel='Sign in with Google'
+            accessibilityLabel='Sign up with Google'
           >
             <AntDesign
               name='google'
@@ -122,9 +116,9 @@ const LoginScreen: React.FC = () => {
           </TouchableOpacity>
           <TouchableOpacity
             style={styles.socialButton}
-            onPress={() => handleSignInWithProvider('oauth_github')}
+            onPress={() => handleSignUpWithProvider('oauth_github')}
             disabled={submitting}
-            accessibilityLabel='Sign in with GitHub'
+            accessibilityLabel='Sign up with GitHub'
           >
             <Octicons
               name='mark-github'
@@ -189,12 +183,12 @@ const LoginScreen: React.FC = () => {
       {/* Bottom Section */}
       <View style={styles.bottom}>
         <View style={styles.signUpRow}>
-          <Text style={styles.bottomText}>Don't have an account?</Text>
+          <Text style={styles.bottomText}>Already have an account?</Text>
           <TouchableOpacity
-            onPress={handleSignUpPress}
-            accessibilityLabel='Sign up'
+            onPress={handleSignInPress}
+            accessibilityLabel='Sign in'
           >
-            <Text style={styles.signUpLink}>Sign up</Text>
+            <Text style={styles.signUpLink}>Sign in</Text>
           </TouchableOpacity>
         </View>
         <View style={styles.clerkRow}>
@@ -376,4 +370,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default LoginScreen;
+export default SignUpScreen;
